@@ -19,7 +19,7 @@ class Recipe:
         self.title = os.path.basename(filename)[:-3]
         self.htmlfile = self.title + '.html'
         soup = BeautifulSoup(self.html)
-        sections = ['ingredients', 'instructions', 'variations', 'suggestions']
+        sections = ['ingredients', 'instructions', 'variations', 'suggestions' 'about']
         regexmap = dict()
         for s in sections:
             regexmap[re.compile(s,re.IGNORECASE)] = s
@@ -69,6 +69,7 @@ def gen_page(recipe):
     text+= "<div id='recipe'>"
     text +=recipe.html
     text += "</div>"
+    text += '<div id=footer>My Cookbook</div>'
     return text
 
 
