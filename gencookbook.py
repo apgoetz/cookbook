@@ -19,7 +19,7 @@ class Recipe:
         self.title = os.path.basename(filename)[:-3]
         self.htmlfile = self.title + '.html'
         soup = BeautifulSoup(self.html)
-        sections = ['ingredients', 'instructions']
+        sections = ['ingredients', 'instructions', 'variations', 'suggestions']
         regexmap = dict()
         for s in sections:
             regexmap[re.compile(s,re.IGNORECASE)] = s
