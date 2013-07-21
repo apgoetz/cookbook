@@ -5,26 +5,51 @@ import glob
 import markdown
 import argparse
 import os
-
-
+import shutil
+import operator
 class Recipe:
     def __init__(self, filename):
         self.filename = filename
         self.text = open(filename).read()
         self.html = markdown.markdown(self.text, extensions=['outline(wrapper_tag=div'])
         self.title = os.path.basename(filename)[:-3]
+        self.htmlfile = self.title + '.html'
 
 
 def get_rcp_files(rcpdir):
     return glob.glob(rcpdir + '/*.md')
 
-def gen_page(recipe, dir):
-    destfile = os.path.join(dir, recipe.title + '.html')
+def get_header(title):
+    return "<div id='header'> <b>"+ title +"</b> &nbsp; <a href='index.html'>Home</a></div>"
+
+def print_html(stylesheet, destfile, text):
     f = open(destfile, 'w')
-    f.write("<div id='header'> <b>"+ recipe.title +"</b> &nbsp; <a href='index.html'>Home</a></div>")
-    f.write("<div id='recipe'>")
-    f.write(recipe.html)
-    f.write("</div>")
+    f.write("""
+    <html>
+    <head>
+    <link rel="stylesheet" type="text/css" href="{}">
+    </head>
+    <body>
+    """.format(os.path.basename(stylesheet)))
+    f.write(text)
+    f.write('</body></html>')
+    f.close()
+
+def get_index(recipes):
+    html = get_header('My Cookbook')
+    html += '<ul>'
+    
+    for r in recipes:
+        html += "<li><a href='{}'>{}<a></li>".format(r.htmlfile, r.title)
+    html += '</ul>'
+    return html
+
+def gen_page(recipe):
+    text = get_header(recipe.title)
+    text+= "<div id='recipe'>"
+    text +=recipe.html
+    text += "</div>"
+    return text
 
 
 
@@ -52,8 +77,15 @@ def main():
     if not os.path.exists(outdir):
         os.mkdir(outdir)
         
-    for recipe in [Recipe(f) for f in get_rcp_files(recipedir)]:
-        gen_page(recipe,outdir)
+    recipes = [Recipe(f) for f in get_rcp_files(recipedir)]
+    recipes.sort(key=operator.attrgetter('title'))
+    for recipe in recipes:
+        print_html(stylefile, os.path.join(outdir, recipe.htmlfile), gen_page(recipe))
+
+    print_html(stylefile, os.path.join(outdir, 'index.html'), get_index(recipes))
+
+    shutil.copyfile(stylefile, os.path.join(outdir, os.path.basename(stylefile)))
+
 
 if(__name__ == '__main__'):
     main()
