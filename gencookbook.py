@@ -7,13 +7,32 @@ import argparse
 import os
 import shutil
 import operator
+import codecs
+import re
+from bs4 import BeautifulSoup
 class Recipe:
     def __init__(self, filename):
+        filename = os.path.abspath(filename)
         self.filename = filename
-        self.text = open(filename).read()
-        self.html = markdown.markdown(self.text, extensions=['outline(wrapper_tag=div'])
+        self.text = codecs.open(filename, encoding='utf-8').read()
+        self.html = markdown.markdown(self.text, extensions=['attr_list', 'outline(wrapper_tag=div)'])
         self.title = os.path.basename(filename)[:-3]
         self.htmlfile = self.title + '.html'
+        soup = BeautifulSoup(self.html)
+        sections = ['ingredients', 'instructions']
+        regexmap = dict()
+        for s in sections:
+            regexmap[re.compile(s,re.IGNORECASE)] = s
+        for header in soup.find_all('h1'):
+            div = header.previous_element
+            # if the user overrode the id, don't try to match up the section
+            if div.has_attr('id'):
+                break
+
+            for (regex, section_name) in regexmap.items():
+                if regex.match(header.text):
+                    div['id'] = section_name
+        self.html = soup.prettify()
 
 
 def get_rcp_files(rcpdir):
@@ -23,10 +42,11 @@ def get_header(title):
     return "<div id='header'> <b>"+ title +"</b> &nbsp; <a href='index.html'>Home</a></div>"
 
 def print_html(stylesheet, destfile, text):
-    f = open(destfile, 'w')
+    f = codecs.open(destfile, encoding='utf-8', mode='w')
     f.write("""
     <html>
     <head>
+    <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{}">
     </head>
     <body>
