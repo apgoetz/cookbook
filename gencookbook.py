@@ -53,16 +53,13 @@ def get_rcp_files(rcpdir):
         tmpdir = tempfile.mkdtemp()
         repo = os.path.basename(name)
         title = repo.split('.')[0]
-#        try:
         if True:
             os.system('git clone {} {}'.format(name,tmpdir))
             for file in [os.path.join(tmpdir,file) for file in os.listdir(tmpdir)]:
                 if file.endswith('.md'):
-                    print("Found Recipe: {}".format(title))
-                    recipes.append(Recipe(file, title, repo))
- #       except:
- #           print('except')
-#        finally:
+                    r = Recipe(file, title, repo)
+                    print("Found Recipe: {}".format(r.title))
+                    recipes.append(r)
             shutil.rmtree(tmpdir)
     return recipes
 
