@@ -64,10 +64,11 @@ def get_rcp_files(rcpdir):
     return recipes
 
 def get_header(title, repo=None):
+    repo_prefix = 'http://cookbook.andygoetz.org/repos/'
     header = "<div id='header'> <b>"+ title +"</b> &nbsp; <a href='index.html'>Home</a>"
     if (repo != None):
-        header += "&nbsp;<a href='repos/{}'>".format(repo)
-        header += "Fork Me! </a>"
+        header += '&nbsp; git repo:&nbsp;'
+        header += "<input maxlength='50' type='text' value='{}' readonly>".format(repo_prefix + repo)
     header += "</div>"
     return header 
 
