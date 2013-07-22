@@ -16,7 +16,8 @@ class Recipe:
         self.filename = filename
         self.text = codecs.open(filename, encoding='utf-8').read()
         self.html = markdown.markdown(self.text, extensions=['attr_list', 'outline(wrapper_tag=div)'])
-        self.title = os.path.basename(filename)[:-3]
+        self.gitdir = os.path.dirname(filename)
+        self.title = os.path.basename(self.gitdir)
         self.htmlfile = self.title + '.html'
         soup = BeautifulSoup(self.html)
         sections = ['ingredients', 'instructions', 'variations', 'suggestions' 'about']
@@ -36,7 +37,13 @@ class Recipe:
 
 
 def get_rcp_files(rcpdir):
-    return glob.glob(rcpdir + '/*.md')
+    recipes = list()
+    for name in [os.path.join(rcpdir,name) for name in os.listdir(rcpdir)]:
+        if os.path.isdir(name):
+            for file in [os.path.join(name,file) for file in os.listdir(name)]:
+                if file.endswith('.md'):
+                    recipes.append(os.path.abspath(file))
+    return recipes
 
 def get_header(title):
     return "<div id='header'> <b>"+ title +"</b> &nbsp; <a href='index.html'>Home</a></div>"
