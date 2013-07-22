@@ -2,12 +2,11 @@
 
 WEBDIR=/var/www/cookbook.andygoetz.org/public_html
 COOKBOOKREPO=/home/agoetz/cookbook.git
-RECIPEREPO=/home/agoetz/recipes
+RECIPEREPO=/var/www/cookbook.andygoetz.org/public_html/repos
 RECIPEDIR=$(mktemp -d)
 COOKBOOKDIR=$(mktemp -d)
 
-echo 'cloning the repos...'
-git clone $RECIPEREPO $RECIPEDIR
+echo 'cloning the repo...'
 git clone $COOKBOOKREPO $COOKBOOKDIR 
 echo "CDing to $COOKBOOKDIR ..."
 pushd $COOKBOOKDIR
@@ -15,11 +14,9 @@ pushd $COOKBOOKDIR
 
 
 echo "Generating the website..."
-./gencookbook.py -o $WEBDIR -r $RECIPEDIR -s style.css 
-
+./gencookbook.py -o $WEBDIR -r $RECIPEREPO -s style.css 
 echo "returning..."
 popd
 
 echo "cleaning up the temporary repo"
-rm -rf $RECIPEDIR
 rm -rf $COOKBOOKDIR
