@@ -2,7 +2,7 @@
 
 WEBDIR=/var/www/cookbook.andygoetz.org/public_html
 COOKBOOKREPO=/home/agoetz/cookbook.git
-RECIPEREPO=/home/agoetz/recipes.git
+RECIPEREPO=/home/agoetz/recipes
 RECIPEDIR=$(mktemp -d)
 COOKBOOKDIR=$(mktemp -d)
 

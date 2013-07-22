@@ -22,7 +22,7 @@ class Recipe:
         soup = BeautifulSoup(self.html)
         sections = ['ingredients', 'instructions', 'variations', 'suggestions' 'about']
         regexmap = dict()
-        for s in sections:
+        for s in sections:os.path.join(recipe.titlos.path.join(recipe.title + '.git')os.path.join(recipe.title + '.git')e + '.git')
             regexmap[re.compile(s,re.IGNORECASE)] = s
         for header in soup.find_all('h1'):
             div = header.previous_element
@@ -110,17 +110,7 @@ def main():
         
     print (outdir)
 
-    if os.path.exists(outdir):
-        for f in os.listdir(outdir):
-            path = os.path.join(outdir,f)
-            try: 
-                if(os.path.isdir(path)):
-                    shutil.rmtree(path)
-                else:
-                    os.unlink(path)
-            except :
-                pass
-    else:
+    if not os.path.exists(outdir):
         os.mkdir(outdir)
         
     recipes = [Recipe(f) for f in get_rcp_files(recipedir)]
@@ -132,7 +122,6 @@ def main():
 
     shutil.copyfile(stylefile, os.path.join(outdir, os.path.basename(stylefile)))
 
-    setup_recipe_repos(recipes, outdir)
 
 if(__name__ == '__main__'):
     main()
