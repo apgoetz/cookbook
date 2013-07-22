@@ -22,7 +22,7 @@ class Recipe:
         soup = BeautifulSoup(self.html)
         sections = ['ingredients', 'instructions', 'variations', 'suggestions' 'about']
         regexmap = dict()
-        for s in sections:os.path.join(recipe.titlos.path.join(recipe.title + '.git')os.path.join(recipe.title + '.git')e + '.git')
+        for s in sections:            
             regexmap[re.compile(s,re.IGNORECASE)] = s
         for header in soup.find_all('h1'):
             div = header.previous_element
@@ -121,7 +121,6 @@ def main():
     print_html(stylefile, os.path.join(outdir, 'index.html'), get_index(recipes))
 
     shutil.copyfile(stylefile, os.path.join(outdir, os.path.basename(stylefile)))
-
 
 if(__name__ == '__main__'):
     main()
