@@ -47,12 +47,14 @@ def get_rcp_files(rcpdir):
     recipes = list()
     for name in [os.path.join(rcpdir,name) for name in os.listdir(rcpdir)]:
         tmpdir = tempfile.mkdtemp()
-        title = os.path.basename(name)[:-4]
+        repo = os.path.basename(name)
+        title = repo.split('.')[0]
         try:
             os.system('git clone {} {}'.format(name,tmpdir))
             for file in [os.path.join(tmpdir,file) for file in os.listdir(tmpdir)]:
                 if file.endswith('.md'):
-                    recipes.append(Recipe(file, title, title +'.git'))
+                    print("Found Recipe: {}".format(title))
+                    recipes.append(Recipe(file, title, repo))
         except:
             print('except')
         finally:
@@ -60,7 +62,6 @@ def get_rcp_files(rcpdir):
     return recipes
 
 def get_header(title, repo=None):
-    print('{} {}'.format(title,repo))
     header = "<div id='header'> <b>"+ title +"</b> &nbsp; <a href='index.html'>Home</a>"
     if (repo != None):
         header += "&nbsp;<a href='repos/{}'>".format(repo)
