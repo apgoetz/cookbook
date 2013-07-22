@@ -35,6 +35,13 @@ class Recipe:
                     div['id'] = section_name
         self.html = soup.prettify()
 
+def setup_recipe_repos(recipes,outdir):
+    for recipe in recipes:
+        destpath = os.path.join(outdir, recipe.title + '.git')
+        print(destpath)
+        os.system('git clone --bare {} {}'.format(recipe.gitdir, destpath))
+        shutil.move(os.path.join(destpath, 'hooks/post-update.sample'), os.path.join(destpath, 'hooks/post-update'))
+    pass
 
 def get_rcp_files(rcpdir):
     recipes = list()
@@ -102,8 +109,9 @@ def main():
     if not os.path.isfile(stylefile):
         print('stylefile {} is not a file!\n'.format(stylefile))
         
-    if not os.path.exists(outdir):
-        os.mkdir(outdir)
+    if os.path.exists(outdir):
+        shutil.rmtree(outdir)
+    os.mkdir(outdir)
         
     recipes = [Recipe(f) for f in get_rcp_files(recipedir)]
     recipes.sort(key=operator.attrgetter('title'))
@@ -114,6 +122,7 @@ def main():
 
     shutil.copyfile(stylefile, os.path.join(outdir, os.path.basename(stylefile)))
 
+    setup_recipe_repos(recipes, outdir)
 
 if(__name__ == '__main__'):
     main()
