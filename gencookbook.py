@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 import glob
@@ -15,9 +15,13 @@ class Recipe:
     def __init__(self, filename, title, repo=None):
         filename = os.path.abspath(filename)
         self.filename = filename
-        self.text = codecs.open(filename, encoding='utf-8').read()
-        self.html = markdown.markdown(self.text, extensions=['attr_list', 'outline(wrapper_tag=div)'])
-        self.title = title
+        self.text = codecs.open(filename, encoding='utf-8').read().strip()
+        md = markdown.Markdown(extensions=['meta', 'attr_list', 'outline(wrapper_tag=div)'])
+        self.html = md.convert(self.text)
+        if 'title' in md.Meta:
+            self.title = md.Meta['title'][0]
+        else:
+            self.title = title
         self.repo = repo
         self.htmlfile = self.title + '.html'
         soup = BeautifulSoup(self.html)
@@ -49,15 +53,16 @@ def get_rcp_files(rcpdir):
         tmpdir = tempfile.mkdtemp()
         repo = os.path.basename(name)
         title = repo.split('.')[0]
-        try:
+#        try:
+        if True:
             os.system('git clone {} {}'.format(name,tmpdir))
             for file in [os.path.join(tmpdir,file) for file in os.listdir(tmpdir)]:
                 if file.endswith('.md'):
                     print("Found Recipe: {}".format(title))
                     recipes.append(Recipe(file, title, repo))
-        except:
-            print('except')
-        finally:
+ #       except:
+ #           print('except')
+#        finally:
             shutil.rmtree(tmpdir)
     return recipes
 
