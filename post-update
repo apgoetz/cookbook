@@ -1,5 +1,3 @@
-# this script automatically updates the website when pushed to
-
 #!/bin/bash
 
 WEBDIR=/var/www/cookbook.andygoetz.org/public_html
