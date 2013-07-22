@@ -92,6 +92,7 @@ def get_index(recipes):
     for r in recipes:
         html += "<li><a href='{}'>{}<a></li>".format(r.htmlfile, r.title)
     html += '</ul>'
+    html += gen_footer()
     return html
 
 def gen_page(recipe):
@@ -99,10 +100,11 @@ def gen_page(recipe):
     text+= "<div id='recipe'>"
     text +=recipe.html
     text += "</div>"
-    text += '<div id=footer>My Cookbook</div>'
+    text += gen_footer()
     return text
 
-
+def gen_footer():
+    return "<div id=footer><b>My Cookbook</b> &nbsp; <a href='http://github.com/apgoetz/cookbook'>Fork me on GitHub!</a></div>"
 
 def main():
     parser = argparse.ArgumentParser()
