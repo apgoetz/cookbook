@@ -9,15 +9,16 @@ import shutil
 import operator
 import codecs
 import re
+import tempfile
 from bs4 import BeautifulSoup
 class Recipe:
-    def __init__(self, filename):
+    def __init__(self, filename, title, repo=None):
         filename = os.path.abspath(filename)
         self.filename = filename
         self.text = codecs.open(filename, encoding='utf-8').read()
         self.html = markdown.markdown(self.text, extensions=['attr_list', 'outline(wrapper_tag=div)'])
-        self.gitdir = os.path.dirname(filename)
-        self.title = os.path.basename(self.gitdir)
+        self.title = title
+        self.repo = repo
         self.htmlfile = self.title + '.html'
         soup = BeautifulSoup(self.html)
         sections = ['ingredients', 'instructions', 'variations', 'suggestions' 'about']
@@ -35,24 +36,37 @@ class Recipe:
                     div['id'] = section_name
         self.html = soup.prettify()
 
-def setup_recipe_repos(recipes,outdir):
-    for recipe in recipes:
-        destpath = os.path.join(outdir, recipe.title + '.git')
-        os.system('git clone --bare {} {}'.format(recipe.gitdir, destpath))
-        shutil.move(os.path.join(destpath, 'hooks/post-update.sample'), os.path.join(destpath, 'hooks/post-update'))
-    pass
+# def setup_recipe_repos(recipes,outdir):
+#     for recipe in recipes:
+#         destpath = os.path.join(outdir, recipe.title + '.git')
+#         os.system('git clone --bare {} {}'.format(recipe.gitdir, destpath))
+#         shutil.move(os.path.join(destpath, 'hooks/post-update.sample'), os.path.join(destpath, 'hooks/post-update'))
+#     pass
 
 def get_rcp_files(rcpdir):
     recipes = list()
     for name in [os.path.join(rcpdir,name) for name in os.listdir(rcpdir)]:
-        if os.path.isdir(name):
-            for file in [os.path.join(name,file) for file in os.listdir(name)]:
+        tmpdir = tempfile.mkdtemp()
+        title = os.path.basename(name)[:-4]
+        try:
+            os.system('git clone {} {}'.format(name,tmpdir))
+            for file in [os.path.join(tmpdir,file) for file in os.listdir(tmpdir)]:
                 if file.endswith('.md'):
-                    recipes.append(os.path.abspath(file))
+                    recipes.append(Recipe(file, title, title +'.git'))
+        except:
+            print('except')
+        finally:
+            shutil.rmtree(tmpdir)
     return recipes
 
-def get_header(title):
-    return "<div id='header'> <b>"+ title +"</b> &nbsp; <a href='index.html'>Home</a></div>"
+def get_header(title, repo=None):
+    print('{} {}'.format(title,repo))
+    header = "<div id='header'> <b>"+ title +"</b> &nbsp; <a href='index.html'>Home</a>"
+    if (repo != None):
+        header += "&nbsp;<a href='repos/{}'>".format(repo)
+        header += "Fork Me! </a>"
+    header += "</div>"
+    return header 
 
 def print_html(stylesheet, destfile, text):
     f = codecs.open(destfile, encoding='utf-8', mode='w')
@@ -78,7 +92,7 @@ def get_index(recipes):
     return html
 
 def gen_page(recipe):
-    text = get_header(recipe.title)
+    text = get_header(recipe.title, recipe.repo)
     text+= "<div id='recipe'>"
     text +=recipe.html
     text += "</div>"
@@ -113,7 +127,7 @@ def main():
     if not os.path.exists(outdir):
         os.mkdir(outdir)
         
-    recipes = [Recipe(f) for f in get_rcp_files(recipedir)]
+    recipes = get_rcp_files(recipedir)
     recipes.sort(key=operator.attrgetter('title'))
     for recipe in recipes:
         print_html(stylefile, os.path.join(outdir, recipe.htmlfile), gen_page(recipe))
