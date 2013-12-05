@@ -65,10 +65,12 @@ def get_rcp_files(rcpdir):
 
 def get_header(title, repo=None):
     repo_prefix = 'http://cookbook.andygoetz.org/repos/'
-    header = "<div id='header'> <b>"+ title +"</b> &nbsp; <a href='index.html'>Home</a>"
+    header = "<div id='header'> <b>"+ title +"</b> &nbsp; <span class=noprint><a href='index.html'>Home</a>"
     if (repo != None):
         header += '&nbsp; git repo:&nbsp;'
         header += "<input maxlength='50' type='text' value='{}' readonly>".format(repo_prefix + repo)
+    header += '&nbsp;<a href="javascript:void(0)" onclick="window.print()">print</a>'
+    header += "</span>"
     header += "</div>"
     return header 
 
@@ -105,7 +107,7 @@ def gen_page(recipe):
     return text
 
 def gen_footer():
-    return "<div id=footer><b>My Cookbook</b> &nbsp; <a href='http://github.com/apgoetz/cookbook'>Fork me on GitHub!</a></div>"
+    return "<div id=footer class=noprint><b>My Cookbook</b> &nbsp; <a href='http://github.com/apgoetz/cookbook'>Fork me on GitHub!</a></div>"
 
 def main():
     parser = argparse.ArgumentParser()
