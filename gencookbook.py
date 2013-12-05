@@ -69,7 +69,8 @@ def get_header(title, repo=None):
     if (repo != None):
         header += '&nbsp; git repo:&nbsp;'
         header += "<input maxlength='50' type='text' value='{}' readonly>".format(repo_prefix + repo)
-    header += '&nbsp;<a href="javascript:void(0)" onclick="window.print()">print</a>'
+    if (title != 'My Cookbook'):
+        header += '&nbsp;<a href="javascript:void(0)" onclick="window.print()">print</a>'
     header += "</span>"
     header += "</div>"
     return header 
